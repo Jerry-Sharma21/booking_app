@@ -1,5 +1,7 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+
 import Layout from './layouts/Layout';
 
 const App: React.FC = () => (
