@@ -1,8 +1,8 @@
 import React from 'react';
 
 import { useForm } from 'react-hook-form';
-import { useMutation } from 'react-query';
 import { useNavigate } from 'react-router-dom';
+import { useMutation, useQueryClient } from 'react-query';
 
 import * as apiClient from '../api-client';
 import { useAppContext } from '../contexts/AppContext';
@@ -17,7 +17,7 @@ export type RegisterFormData = {
 
 const Register: React.FC = () => {
   const { showToast } = useAppContext();
-
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   const {
@@ -28,11 +28,12 @@ const Register: React.FC = () => {
   } = useForm<RegisterFormData>();
 
   const mutation = useMutation(apiClient.register, {
-    onSuccess: () => {
+    onSuccess: async () => {
       showToast({
         message: 'Registration Success!',
         type: 'SUCCESS',
       });
+      await queryClient.invalidateQueries('validateToken');
       navigate('/');
     },
 
@@ -44,7 +45,7 @@ const Register: React.FC = () => {
     },
   });
 
-  const onSubmit = handleSubmit((data) => {
+  const onSubmit = handleSubmit(data => {
     mutation.mutate(data);
   });
 
@@ -107,7 +108,7 @@ const Register: React.FC = () => {
           type="password"
           className="border rounded w-full py-1 px-2 font-normal"
           {...register('confirmPassword', {
-            validate: (value) => {
+            validate: value => {
               if (!value) {
                 return 'This field is required';
               } else if (watch('password') != value) {
